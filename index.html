@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title></title>
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    let url = 'https://zwfwxtzx.shaanxi.gov.cn/recept/media/oss/DEFAULT/FORM/MATERIAL/8a3ba33c-15d2-42ee-a678-a46082391170/65686689'
+
+    function createRandomId() {
+      let prefix =  Math.floor(Math.random() * 100000000 + 123456789).toString(16).substring(0, 5);
+      let suffix =  Math.floor(Math.random() * 100000000 + 123456789).toString().substring(3, 8);
+      let time = new Date().getTime();
+      let temp = "h5" + prefix + "-" + time + "-" + suffix;
+
+      temp = temp.replace(/\./g, "");
+
+      return temp;
+    }
+
+    // 获取URL参数
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const params = {};
+      for (const [key, value] of urlParams) {
+        params[key] = value;
+      }
+      return params;
+    }
+
+    // 获取当前页面的所有参数
+    const urlParams = getUrlParams();
+    
+    // 检查是否有openid参数，如果有则使用，否则生成或从localStorage获取
+    let openid;
+    if (urlParams.openid) {
+      openid = urlParams.openid;
+      localStorage.setItem('XIAOKEFU_OPENID', openid);
+    } else {
+      openid = localStorage.getItem('XIAOKEFU_OPENID') || createRandomId();
+      localStorage.setItem('XIAOKEFU_OPENID', openid);
+    }
+
+    // 构建iframe的URL参数
+    const iframeParams = new URLSearchParams();
+    iframeParams.set('openid', openid);
+    
+    // 将当前页面的其他参数也传递给iframe（除了openid，因为已经处理过了）
+    for (const [key, value] of Object.entries(urlParams)) {
+      if (key !== 'openid') {
+        iframeParams.set(key, value);
+      }
+    }
+
+    const iframe = document.createElement('iframe');
+    
+    // 检查原URL是否已经包含参数
+    const separator = url.includes('?') ? '&' : '?';
+    iframe.src = url + separator + iframeParams.toString();
+    iframe.className = 'xiaokefu_chat_iframe';
+    iframe.frameBorder = 0;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+  </script>
+</body>
+</html>
